@@ -258,6 +258,8 @@ type blockBodyDiffPrinter struct {
 	requiredReplace cty.PathSet
 	// verbose is set to true when using the "diff" printer to format state
 	verbose bool
+	// configurableOnly can be set to true from a user flag
+	configurableOnly bool
 }
 
 type blockBodyDiffResult struct {
@@ -326,6 +328,9 @@ func (p *blockBodyDiffPrinter) writeAttrsDiff(
 	displayAttrNames := make(map[string]string, len(attrsS))
 	attrNameLen := 0
 	for name := range attrsS {
+		if p.configurableOnly && !attrsS[name].Required && !attrsS[name].Optional {
+			continue
+		}
 		oldVal := ctyGetAttrMaybeNull(old, name)
 		newVal := ctyGetAttrMaybeNull(new, name)
 		if oldVal.IsNull() && newVal.IsNull() {

@@ -22,6 +22,7 @@ func (c *StateShowCommand) Run(args []string) int {
 	args = c.Meta.process(args)
 	cmdFlags := c.Meta.defaultFlagSet("state show")
 	cmdFlags.StringVar(&c.Meta.statePath, "state", "", "path")
+	cmdFlags.BoolVar(&c.Meta.configurableStateOnly, "configurable", false, "configruable arguments only")
 	if err := cmdFlags.Parse(args); err != nil {
 		c.Ui.Error(fmt.Sprintf("Error parsing command-line flags: %s\n", err.Error()))
 		return 1
@@ -138,9 +139,10 @@ func (c *StateShowCommand) Run(args []string) int {
 	)
 
 	output := format.State(&format.StateOpts{
-		State:   singleInstance,
-		Color:   c.Colorize(),
-		Schemas: schemas,
+		State:            singleInstance,
+		Color:            c.Colorize(),
+		Schemas:          schemas,
+		ConfigurableOnly: c.Meta.configurableStateOnly,
 	})
 	c.Ui.Output(output[strings.Index(output, "#"):])
 
@@ -163,6 +165,9 @@ Options:
                       up Terraform-managed resources. By default it will
                       use the state "terraform.tfstate" if it exists.
 
+  -configurable       Filter the state to only show configurable
+                      arguments. This may be useful for copying the
+                      currently configurable state into your source code.
 `
 	return strings.TrimSpace(helpText)
 }
