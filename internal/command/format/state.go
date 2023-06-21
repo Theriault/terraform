@@ -26,6 +26,8 @@ type StateOpts struct {
 
 	// Color is the colorizer. This is optional.
 	Color *colorstring.Colorize
+
+	ConfigurableOnly bool
 }
 
 // State takes a state and returns a string
@@ -45,10 +47,11 @@ func State(opts *StateOpts) string {
 
 	buf := bytes.NewBufferString("[reset]")
 	p := blockBodyDiffPrinter{
-		buf:     buf,
-		color:   opts.Color,
-		action:  plans.NoOp,
-		verbose: true,
+		buf:              buf,
+		color:            opts.Color,
+		action:           plans.NoOp,
+		verbose:          true,
+		configurableOnly: opts.ConfigurableOnly,
 	}
 
 	// Format all the modules
